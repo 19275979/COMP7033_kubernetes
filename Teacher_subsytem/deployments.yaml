@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clacloteacher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clacloteacher
+  template:
+    metadata:
+      labels:
+        app: clacloteacher
+    spec:
+      containers: 
+        - name: teacher-system
+          image: us-central1-docker.pkg.dev/comp7033-412816/comp7033/teacher-system
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "256Mi"
+          env:
+            - name: MONGODB_USERNAME_19275979
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-atlas-credentials
+                  key: username
+            - name: MONGODB_PASSWORD_19275979
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-atlas-credentials
+                  key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clacloteacher
+spec:
+  selector:
+    app: clacloteacher
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer
+
